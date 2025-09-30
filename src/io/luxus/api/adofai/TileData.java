@@ -33,6 +33,7 @@ import io.luxus.api.adofai.action.SetPlanetRotation;
 import io.luxus.api.adofai.action.SetSpeed;
 import io.luxus.api.adofai.action.ShakeScreen;
 import io.luxus.api.adofai.action.Twirl;
+import io.luxus.api.adofai.action.Pause;
 import io.luxus.api.adofai.module.MapModule;
 import io.luxus.api.adofai.type.EventType;
 import io.luxus.api.adofai.type.TileAngle;
@@ -130,6 +131,9 @@ public class TileData {
 		case CHANGE_TRACK:
 			action = new ChangeTrack();
 			break;
+		case PAUSE:
+			action = new Pause();
+			break;
 		}
 
 		List<Action> actionList = actionListMap.get(eventType);
@@ -164,6 +168,7 @@ public class TileData {
 		save(sb, EventType.REPEAT_EVENTS);
 		save(sb, EventType.BLOOM);
 		save(sb, EventType.SET_CONDITIONAL_EVENTS);
+		save(sb, EventType.PAUSE);
 	}
 
 	private void save(StringBuilder sb, EventType eventType) {

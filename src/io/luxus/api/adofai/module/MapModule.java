@@ -38,6 +38,7 @@ public class MapModule {
 			stringEventTypeBiMap.put(EventType.BLOOM.toString(), EventType.BLOOM);
 			stringEventTypeBiMap.put(EventType.SET_CONDITIONAL_EVENTS.toString(), EventType.SET_CONDITIONAL_EVENTS);
 			stringEventTypeBiMap.put(EventType.CHANGE_TRACK.toString(), EventType.CHANGE_TRACK);
+			stringEventTypeBiMap.put(EventType.PAUSE.toString(), EventType.PAUSE);
 		}
 		
 		return stringEventTypeBiMap;

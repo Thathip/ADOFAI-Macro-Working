@@ -23,6 +23,7 @@ public enum EventType {
 	BLOOM("Bloom", false), // angleOffset
 	SET_CONDITIONAL_EVENTS("SetConditionalEvents", true),
 	CHANGE_TRACK("ChangeTrack", false), // maybe false
+	PAUSE("Pause", true)
 	;
 	
 	private String type;
@@ -37,7 +38,11 @@ public enum EventType {
 	public String toString() {
 		return type;
 	}
-	
+
+	public String getName() {
+		return type;
+	}
+
 	public boolean isSingleOnly() {
 		return singleOnly;
 	}

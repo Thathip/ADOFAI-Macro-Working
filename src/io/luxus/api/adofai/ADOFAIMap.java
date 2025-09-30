@@ -53,6 +53,26 @@ public class ADOFAIMap extends MapData {
 				reverse = !reverse;
 			}
 			
+			// MIDSPIN は1拍相当のタイルとして扱い、向き/座標は据え置き
+			if (now.getTileAngle() == TileAngle.MIDSPIN) {
+				double relativeAngle = 180.0; // = 1 beat
+				Tile tile = new Tile(
+						now.getFloor(),
+						now.getTileAngle(),
+						now.getActionListMap(),
+						bpm,
+						relativeAngle,
+						staticAngle,   // 進行方向はそのまま
+						reverse,
+						x, y           // 座標も据え置き（進まない）
+				);
+				this.tileList.add(tile);
+
+				// 次の反復へ（staticAngle/x/y は更新しない）
+				now = next;
+				continue;
+			}
+
 			AngleConverter.Result result = AngleConverter.convert(staticAngle, now.getTileAngle(), next.getTileAngle(), reverse, now.getTileAngle() != TileAngle.NONE);
 			double relativeAngle = result.getRelativeAngle();
 			

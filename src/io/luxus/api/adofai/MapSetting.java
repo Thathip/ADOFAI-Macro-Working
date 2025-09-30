@@ -81,7 +81,7 @@ public class MapSetting {
 		this.previewSongStart = 0L;
 		this.previewSongDuration = 10L;
 		this.seizureWarning = "Disabled";
-		this.levelDesc = "레벨에 대해 말해보세요!";
+		this.levelDesc = "";
 		this.levelTags = "";
 		this.artistLinks = "";
 		this.difficulty = 1L;
@@ -203,7 +203,7 @@ public class MapSetting {
 		this.artistPermission = (String) json.get("artistPermission");
 		this.song = (String) json.get("song");
 		this.author = (String) json.get("author");
-		this.separateCountdownTime = (String) json.get("separateCountdownTime");
+		this.separateCountdownTime = String.valueOf(json.get("separateCountdownTime"));
 		this.songFilename = (String) json.get("songFilename");
 		this.bpm = SafeDatatypeConverter.toDouble(json.get("bpm"));
 		this.volume = (Long) json.get("volume");
@@ -229,8 +229,8 @@ public class MapSetting {
 		// json.get("parallax"));
 		this.parallax = (List<Long>) json.get("parallax");
 		this.bgDisplayMode = (String) json.get("bgDisplayMode");
-		this.lockRot = (String) json.get("lockRot");
-		this.loopBG = (String) json.get("loopBG");
+		this.lockRot = String.valueOf(json.get("lockRot"));
+		this.loopBG = String.valueOf(json.get("loopBG"));
 		this.unscaledSize = (Long) json.get("unscaledSize");
 		this.relativeTo = (String) json.get("relativeTo");
 		// this.position = JSONObjectConverter.toIntArray((JSONArray)
@@ -239,10 +239,10 @@ public class MapSetting {
 		this.rotation = SafeDatatypeConverter.toDouble(json.get("rotation"));
 		this.zoom = (Long) json.get("zoom");
 		this.bgVideo = (String) json.get("bgVideo");
-		this.loopVideo = (String) json.get("loopVideo");
+		this.loopVideo = String.valueOf(json.get("loopVideo"));
 		this.vidOffset = (Long) json.get("vidOffset");
-		this.floorIconOutlines = (String) json.get("floorIconOutlines");
-		this.stickToFloors = (String) json.get("stickToFloors");
+		this.floorIconOutlines = String.valueOf(json.get("floorIconOutlines"));
+		this.stickToFloors = String.valueOf(json.get("stickToFloors"));
 		this.planetEase = (String) json.get("planetEase");
 		this.planetEaseParts = (Long) json.get("planetEaseParts");
 	}

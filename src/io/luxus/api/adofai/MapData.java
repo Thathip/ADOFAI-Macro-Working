@@ -66,7 +66,8 @@ public class MapData implements Cloneable {
 	}
 
 	public void load(JSONObject json) throws ParseException {
-
+		@SuppressWarnings("unchecked")
+		List<Number> angleData = (List<Number>) json.get("angleData");
 		String pathData = (String) json.get("pathData");
 		JSONObject settings = (JSONObject) json.get("settings");
 
@@ -76,48 +77,93 @@ public class MapData implements Cloneable {
 		// tile data set
 		@SuppressWarnings("unchecked")
 		List<JSONObject> floorActions = (List<JSONObject>) json.get("actions");
-		ListIterator<JSONObject> it = floorActions.listIterator();
+		ListIterator<JSONObject> it = (floorActions == null) ? null : floorActions.listIterator();
 
-		char[] chars = pathData.toCharArray();
 		JSONObject obj;
-		if (!it.hasNext())
+		if (it == null || !it.hasNext()) {
 			obj = null;
-		else
+		} else {
 			obj = it.next();
+		}
 
 		TileData tileData = new TileData(0, TileAngle.NONE);
 		tileDataList.add(tileData);
 		if(obj != null) {
 			while (0 == (Long) obj.get("floor")) {
 				tileData.addAction(obj);
-				if (it.hasNext()) {
+				if (it != null &&it.hasNext()) {
 					obj = it.next();
 				} else {
+					obj = null;
 					break;
 				}
 			}
 		}
-		for (int i = 1; i <= chars.length; i++) {
-			char c = chars[i - 1];
-			TileAngle tileAngle = MapModule.getCharTileAngleBiMap().get(c);
-			if (tileAngle == null) {
-				throw new NullPointerException("tileAngle convert failed:" + c);
+
+		//angleData branch
+		if (angleData != null) {
+			for (int i = 1; i <= angleData.size(); i++) {
+				double deg = angleData.get(i - 1).doubleValue();
+
+				// Map degree -> TileAngle (exact match expected in official angleData)
+				TileAngle tileAngle = null;
+
+				if (deg == 999.0) {
+					tileAngle = TileAngle.MIDSPIN;
+				} else {
+					double norm = deg % 360.0;
+					if (norm < 0) norm += 360.0; // normalize to [0, 360)
+					if (Math.abs(norm - 360.0) < 1e-9) norm = 0.0;
+					final double EPS = 1e-6;
+					for (TileAngle ta : TileAngle.values()) {
+						if (Math.abs(ta.getAngle() - norm) < EPS) {
+							tileAngle = ta;
+							break;
+						}
+					}
+				}
+				if (tileAngle == null) {
+					throw new NullPointerException("tileAngle convert failed(angleData): " + deg);
+				}
+
+				tileData = new TileData(i, tileAngle);
+				tileDataList.add(tileData);
+
+				if (obj != null) {
+					while (i == (Long) obj.get("floor")) {
+						tileData.addAction(obj);
+						if (it != null && it.hasNext()) {
+							obj = it.next();
+						} else {
+							obj = null;
+							break;
+						}
+					}
+				}
 			}
-			tileData = new TileData(i, tileAngle);
-			tileDataList.add(tileData);
-			
-			if(obj != null) {
-				while (i == (Long) obj.get("floor")) {
-					tileData.addAction(obj);
-					if (it.hasNext()) {
-						obj = it.next();
-					} else {
-						break;
+		} else {
+			char[] chars = pathData.toCharArray();
+			for (int i = 1; i <= chars.length; i++) {
+				char c = chars[i - 1];
+				TileAngle tileAngle = MapModule.getCharTileAngleBiMap().get(c);
+				if (tileAngle == null) {
+					throw new NullPointerException("tileAngle convert failed:" + c);
+				}
+				tileData = new TileData(i, tileAngle);
+				tileDataList.add(tileData);
+				
+				if(obj != null) {
+					while (i == (Long) obj.get("floor")) {
+						tileData.addAction(obj);
+						if (it.hasNext()) {
+							obj = it.next();
+						} else {
+							break;
+						}
 					}
 				}
 			}
 		}
-
 	}
 
 	private String readString(File f, String format) throws IOException {

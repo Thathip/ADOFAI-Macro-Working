@@ -26,7 +26,7 @@ public class PositionTrack extends Action {
 	@Override
 	public void load(JSONObject json) throws ParseException {
 		this.positionOffset = SafeDatatypeConverter.toDoubleList(json.get("positionOffset"));
-		this.editorOnly = (String) json.get("editorOnly");
+		this.editorOnly = String.valueOf(json.get("editorOnly"));
 	}
 	
 	@Override

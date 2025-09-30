@@ -16,8 +16,18 @@ import org.json.simple.parser.ParseException;
 import io.luxus.api.adofai.ADOFAIMap;
 import io.luxus.api.adofai.MapData;
 import io.luxus.api.adofai.Tile;
+import io.luxus.api.adofai.action.Action;
+import io.luxus.api.adofai.type.EventType;
 
 public class Macro {
+	private static class DelayEntry {
+		final long nanos;
+		final boolean press;
+		DelayEntry(long nanos, boolean press) {
+			this.nanos = nanos;
+			this.press = press;
+		}
+	}
 	
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -53,11 +63,11 @@ public class Macro {
 		System.out.print("Delay : ");
 		int loadDelay = scanner.nextInt();
 		scanner.nextLine();
-		
-		List<Long> delayList = new ArrayList<>();
+
+		List<DelayEntry> delayList = new ArrayList<>();
 		BigDecimal result = bd("60000").divide(bd(mapData.getSetting().getBpm()), 100, RoundingMode.HALF_EVEN).multiply(bd("6.5")).add(bd(mapData.getSetting().getOffset())).add(bd(loadDelay)).multiply(bd("1000000"));
 		long longResult = (long) result.longValue();
-		delayList.add(longResult);
+		delayList.add(new DelayEntry(longResult, false));
 		BigDecimal error = result.subtract(bd(longResult));
 		
 		List<Tile> tileList = adofaiMap.getTileList();
@@ -84,8 +94,22 @@ public class Macro {
 					error = error.subtract(bd(longError));
 				}
 				
-				delayList.add(longResult);
-				
+				delayList.add(new DelayEntry(longResult, true)); // ★従来の叩き: 押す
+				                // ★追加: Pause イベント対応
+                List<Action> pauses = tile.getActionListIfNotEmpty(EventType.PAUSE);
+                if (pauses != null) {
+                    for (Action a : pauses) {
+                        // durationは拍数。1拍 = 60000 / bpm [ms]
+                        double beats = ((io.luxus.api.adofai.action.Pause)a).getDuration();
+                        if (beats > 0) {
+                            BigDecimal pauseMs = bd("60000").divide(bd(tempBPM), 100, RoundingMode.HALF_EVEN) // 1拍(ms)
+                                    .multiply(bd(beats));
+                            long pauseNs = pauseMs.multiply(bd("1000000")).longValue();
+                            if (pauseNs < 1000000) pauseNs = 1000000; // 1ms未満は切り上げ（任意）
+                            delayList.add(new DelayEntry(pauseNs, false)); // ★押さない待機
+                        }
+                    }
+                }
 			}
 		}
 		
@@ -109,14 +133,16 @@ public class Macro {
 		robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		
-		Iterator<Long> it = delayList.iterator();
+		Iterator<DelayEntry> it = delayList.iterator();
 		
 		long prev_nanos = System.nanoTime();
 		long curr_nanos;
 		
 		boolean mask = false;
 		
-		long delay = it.next();
+		DelayEntry de = it.next();
+		long delay = de.nanos;
+		boolean pressAfterDelay = de.press;
 		boolean keep = true;
 		boolean nextKeep = it.hasNext();
 		
@@ -128,14 +154,16 @@ public class Macro {
 				//System.out.println("c:" + delay / 1000000.0 + "ms");
 				mask = !mask;
 				if(mask) {
-					robot.keyPress('V');
-					robot.keyRelease('V');
+					robot.keyPress('E');
+					robot.keyRelease('E');
 				} else {
-					robot.keyPress('N');
-					robot.keyRelease('N');
+					robot.keyPress('P');
+					robot.keyRelease('P');
 				}
 				if(nextKeep) {
-					delay = it.next();
+					de = it.next();
+					delay = de.nanos;
+					pressAfterDelay = de.press;
 				}
 				keep = nextKeep;
 				nextKeep = it.hasNext();

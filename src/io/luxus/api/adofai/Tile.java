@@ -17,15 +17,15 @@ public class Tile extends TileData {
 	private double x;
 	private double y;
 
-//	public Tile(int floor, TileAngle tileAngle, double bpm, double relativeAngle, boolean reversed, double x, double y) {
-//		super(floor, tileAngle);
-//
-//		this.bpm = bpm;
-//		this.relativeAngle = relativeAngle;
-//		this.reversed = reversed;
-//		this.x = x;
-//		this.y = y;
-//	}
+	//	public Tile(int floor, TileAngle tileAngle, double bpm, double relativeAngle, boolean reversed, double x, double y) {
+	//		super(floor, tileAngle);
+	//
+	//		this.bpm = bpm;
+	//		this.relativeAngle = relativeAngle;
+	//		this.reversed = reversed;
+	//		this.x = x;
+	//		this.y = y;
+	//	}
 
 	public Tile(int floor, TileAngle tileAngle, Map<EventType, List<Action>> actionListMap, double bpm,
 			double relativeAngle, double staticAngle, boolean reversed, double x, double y) {

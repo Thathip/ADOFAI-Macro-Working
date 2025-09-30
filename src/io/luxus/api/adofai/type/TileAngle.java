@@ -29,7 +29,10 @@ public enum TileAngle {
 	_6('6', 252, true),
 	_7('7', 900.0 / 7.0, true),
 	_8('8', 360 - 900.0 / 7.0, true),
+	MIDSPIN('9', 999, true),
 	NONE('!', 0, true),
+	_157_5('x', 157.5, false), //ここどうするんだろ、名前入れたくない
+	_112_5('y', 112.5, false)
 	;
 	
 	private char name;
